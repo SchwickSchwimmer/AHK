@@ -1,0 +1,476 @@
+#SingleInstance, Force
+#MaxThreadsPerHotkey 2
+
+;================================
+;Functions Reference
+;================================
+
+#f::
+Msgbox, Windows+1: Run Auto Refresh`nWindows+Shift+1: Auto Click`nWindows+2: Get Mouse Position for Auto Refresh`nWindows+Shift+2: Set Mouse Position for Auto Refresh`nWindows+4: Enrollment Blurb`nWindows+5: QA Notes`nWindows+6: Meeting Minutes`nWindows+7: Creates Daily Note`nWindows+8: Internal File Name`nWindows+9: Request Note Template`nWindows+0: Ping Template`nWindows+b: Pastes alias and hits enter`nWindows+o: Opp ID Blurb`nWindows+Shift+r: Ramped Payments Note`nWindows+Shift+f: Ramped FPT Note`nWindows+Shift+d: BDSG Motto`nWindows+Shift+m: ¯\_(ツ)_/¯`nWindows+Shift+n: (ノಠ益ಠ)ノ︵ ┻━┻`nWindows+Shift+b: ( ͡° ͜ʖ ͡°)`nWindows+Shift+p: Good Morning`nWindows+Shift+q: Peace`nWindows+q: QA Signature 👍G2G`nWindows+s: Deal Summary
+Return
+
+
+;===============================
+;GET MOUSE CtrlCLICK POSITION HOTKEY
+;===============================
+
+#2::
+	
+	clickposy = 0
+	clickposx = 0
+	ctrlclickposx := ""
+	ctrlclickposy := ""
+	classVar := ""
+
+	MsgBox Click location to record.
+	click_count = 0
+	KeyWait, LButton, D ; Wait for the left mouse button to be pressed down.
+	KeyWait, LButton, U ; Wait for the left mouse button to be pressed down.
+		MouseGetPos, clickposx, clickposy,
+	AHKCommand = %clickposx%, %clickposy%
+	WinGetClass, ClassVar, A
+	WinGetActiveTitle, ClassTitl
+	MsgBox Coords are "%AHKCommand%" in the  %ClassVar% - %ClassTitl% App press Windows + 1 to run AutoClick.
+		ctrlclickposx := % "x" . clickposx ;append "x" and "y" to position per ControlClick syntax
+	ctrlclickposy := % "y" . clickposy
+return
+
+;===============================
+;GET MOUSE MouseCLICK POSITION HOTKEY
+;===============================
+
+#+2::
+	MsgBox Click location to record.
+	click_count = 0
+	KeyWait, LButton, D ; Wait for the left mouse button to be pressed down.
+	KeyWait, LButton, U ; Wait for the left mouse button to be pressed down.
+		MouseGetPos, clickposx, clickposy,
+	AHKCommand = %clickposx%, %clickposy%
+	MsgBox Coords are "%AHKCommand%" press Windows + 1 to run AutoClick.
+return
+
+;===============================
+;AUTO Control CLICK Loop
+;===============================
+#1::
+
+	LoopRUN :=!LoopRUN
+		if (!LoopRUN)
+			return
+		While (LoopRUN)
+			{
+				ControlClick, %ctrlclickposx% %ctrlclickposy%, ahk_class %ClassVar%,, Left, 1, NA
+				Sleep 1000
+			}
+		return
+
+;===============================
+;AUTO Mouse CLICK  Loop
+;===============================
+
+#+1::
+
+ LoopRUN :=!LoopRUN
+	if (!LoopRUN)
+		return
+	While (LoopRUN)
+		{
+			MouseClick, Left, clickposx, clickposy
+			Sleep 2000
+		}
+	return
+
+;================================
+;Supplemental Invoice Date
+;================================
+
+#4::
+	SendInput Invoice Date: Enrollment Effective Date or if received after Enrollment Effective Date upon our acceptance
+return
+
+;================================
+;Daily Notes File				
+;================================
+
+#7::
+	FormatTime, filename,, MMMM yyyy
+	FormatTime, textfiledate,, MM-dd-yyyy
+	ctfd  = %textfiledate%.txt
+
+	FileTest := false
+	TextTest := false
+
+	Loop, C:\Users\v-davidpaff\Documents\Daily Notes\*., 2, 0
+	{
+		if(A_LoopFileName = filename)
+		{
+			MonthlyFileName = C:\Users\v-davidpaff\Documents\Daily Notes\%filename%\
+			FileTest := true
+			break
+		}
+		else
+			continue
+	}
+
+	Loop, %MonthlyFileName%*.txt, 0, 0
+	{
+		if(A_LoopFileName = ctfd)
+			{
+				DailyNoteText = "%MonthlyFileName%%filename%\%ctfd%"
+				TextTest := true
+				break
+			}
+		else
+			continue
+	}
+
+	if (FileTest = true and TextTest = true)
+		{
+			Run, %ctfd%, %MonthlyFileName%
+		}
+
+	if (FileTest = false)
+	{
+		FileCreateDir, C:\Users\v-davidpaff\Documents\Daily Notes\%filename%
+		FileAppend, , C:\Users\v-davidpaff\Documents\Daily Notes\%filename%\%ctfd%
+		Run, %ctfd%, C:\Users\v-davidpaff\Documents\Daily Notes\%filename%\
+	}
+	
+	if (FileTest = true and TextTest = false)
+		{
+			FileAppend, , C:\Users\v-davidpaff\Documents\Daily Notes\%filename%\%ctfd%
+			Run, %ctfd%, C:\Users\v-davidpaff\Documents\Daily Notes\%filename%\
+		}
+return
+;================================
+;Meeting Minutes File				
+;================================
+
+#6::
+	FormatTime, filename,, MMMM yyyy
+	FormatTime, textfiledate,, MM-dd-yyyy
+	ctfd  = %textfiledate%.txt
+
+	FileTest := false
+	TextTest := false
+
+	Loop, C:\Users\v-davidpaff\Documents\Meeting Minutes\*., 2, 0
+	{
+		if(A_LoopFileName = filename)
+		{
+			MonthlyFileName = C:\Users\v-davidpaff\Documents\Meeting Minutes\%filename%\
+			FileTest := true
+			break
+		}
+		else
+			continue
+	}
+
+	Loop, %MonthlyFileName%*.txt, 0, 0
+	{
+		if(A_LoopFileName = ctfd)
+			{
+				DailyNoteText = "%MonthlyFileName%%filename%\%ctfd%"
+				TextTest := true
+				break
+			}
+		else
+			continue
+	}
+
+	if (FileTest = true and TextTest = true)
+		{
+			Run, %ctfd%, %MonthlyFileName%
+		}
+
+	if (FileTest = false)
+	{
+		FileCreateDir, C:\Users\v-davidpaff\Documents\Meeting Minutes\%filename%
+		FileAppend, , C:\Users\v-davidpaff\Documents\Meeting Minutes\%filename%\%ctfd%
+		Run, %ctfd%, C:\Users\v-davidpaff\Documents\Meeting Minutes\%filename%\
+	}
+	
+	if (FileTest = true and TextTest = false)
+		{
+			FileAppend, , C:\Users\v-davidpaff\Documents\Meeting Minutes\%filename%\%ctfd%
+			Run, %ctfd%, C:\Users\v-davidpaff\Documents\Meeting Minutes\%filename%\
+		}
+return
+;================================
+;QAing File				
+;================================
+
+#5::
+	FormatTime, filename,, MMMM yyyy
+	FormatTime, textfiledate,, MM-dd-yyyy-QA
+	ctfd  = %textfiledate%.txt
+
+	FileTest := false
+	TextTest := false
+
+	Loop, C:\Users\v-davidpaff\Documents\QA\*., 2, 0
+	{
+		if(A_LoopFileName = filename)
+		{
+			MonthlyFileName = C:\Users\v-davidpaff\Documents\QA\%filename%\
+			FileTest := true
+			break
+		}
+		else
+			continue
+	}
+
+	Loop, %MonthlyFileName%*.txt, 0, 0
+	{
+		if(A_LoopFileName = ctfd)
+			{
+				DailyNoteText = "%MonthlyFileName%%filename%\%ctfd%"
+				TextTest := true
+				break
+			}
+		else
+			continue
+	}
+
+	if (FileTest = true and TextTest = true)
+		{
+			Run, %ctfd%, %MonthlyFileName%
+		}
+
+	if (FileTest = false)
+	{
+		FileCreateDir, C:\Users\v-davidpaff\Documents\QA\%filename%
+		FileAppend, , C:\Users\v-davidpaff\Documents\QA\%filename%\%ctfd%
+		Run, %ctfd%, C:\Users\v-davidpaff\Documents\QA\%filename%\
+	}
+	
+	if (FileTest = true and TextTest = false)
+		{
+			FileAppend, , C:\Users\v-davidpaff\Documents\QA\%filename%\%ctfd%
+			Run, %ctfd%, C:\Users\v-davidpaff\Documents\QA\%filename%\
+		}
+return
+;================================
+;Microsoft v dash for explore
+;================================
+
+#b::
+	SendInput v-paffdavid@microsoft.com{Enter}
+return
+
+;================================
+;Internal CPS File Name
+;================================
+
+#8::
+	SendInput {Text}Internal CPS with Discounts_en-US_CPS_XXXXXXX_XXX_Final_Discount_CTM
+return
+
+;================================
+;Deal Summary Details
+;================================
+
+#s::
+	SetKeyDelay, 30
+	Sendinput --------------------{Enter}
+	SendInput Summary Of Deal {Enter}
+	SendInput Quote Type:{Tab}{Enter}
+	SendInput EA/SCE/EAS:{Tab}{Enter}
+	SendInput Sup Docs:{Tab}{Enter}
+	SendInput Brief Desc. of Request:{Enter}{Enter}
+	SendInput Potential Issues:{Enter}{Enter}
+	SendInput EASE:{Enter}
+	SendInput Explore:{Enter}
+	SendInput EmpGuide:{Enter}
+	SendInput MMs:{Enter}
+	Sendinput --------------------{Enter}
+
+Return
+
+;================================
+;Notes Format
+;================================
+SendMode Input
+SetKeyDelay, 30,500
+#9::
+	{
+	Send {Enter}==================================================================={Enter}
+	Send CAS/Name:{Tab}{Tab}{Enter}
+	Send Region:{Tab}{Tab}{Enter}
+	Send Final/Prelim:{Tab}{Enter}
+	Send CPS Type:{Tab}{Tab}{Enter}
+	Send EA/SCE/EAS:{Tab}{Tab}{Enter}
+	Send MSQ ID:{Tab}{Tab}{Enter}
+	Send Opp ID:{Tab}{Tab}{Enter}
+	Send Price List/level:{Tab}{Tab}{Enter}
+	Send Enrollment:{Tab}{Tab}{Enter}
+	Send Indirect/Direct:{Tab}{Tab}{Enter}
+	Send TOA:{Tab}{Tab}{Tab}{Enter}
+	Send TDV:{Tab}{Tab}{Tab}{Enter}
+	Send DSC:{Tab}{Tab}{Tab}{Enter}
+	Send MRP:{Tab}{Tab}{Tab}{Enter}
+	Send Flag:{Tab}{Tab}{Tab}{Enter}
+	Send Sup Docs:{Tab}{Tab}{Enter}
+	Send Disc Just:{Tab}{Tab}{Enter}
+	}
+		MsgBox, 4, , Does this quote require input of contact info?
+			IfMsgBox Yes
+				{
+				Send --------------------{Enter}
+				Send CUSTOMER INFO{Enter}
+				Send PCN:{Tab}{Tab}{Tab}{Enter}
+				Send Company Name:{Tab}{Enter}
+				Send Address Line 1:{Tab}{Enter}
+				Send Address Line 2:{Tab}{Enter}
+				Send Name:{Tab}{Tab}{Tab}{Enter}
+				Send Email:{Tab}{Tab}{Enter}
+				Send Phone:{Tab}{Tab}{Enter}{Enter}
+				Send PARTNER INFO{Enter}
+				Send PCN:{Tab}{Tab}{Tab}{Enter}
+				Send Company Name:{Tab}{Enter}
+				Send Address Line 1:{Tab}{Enter}
+				Send Address Line 2:{Tab}{Enter}
+				Send Name:{Tab}{Tab}{Tab}{Enter}
+				Send Email:{Tab}{Tab}{Enter}
+				Send Phone:{Tab}{Tab}{Enter}{Enter}
+				Send MS CONTACT INFO{Enter}
+				Send Name:{Tab}{Tab}{Tab}{Enter}
+				Send Domain\Alias:{Tab}{Enter}
+				Send Phone:{Tab}{Tab}{Enter}
+				}
+	Send --------------------{Enter}
+	Send Request:{Enter}{Enter}
+	Send --------------------{Enter}
+			MsgBox, 4, , Is this a Revised Request?
+			IfMsgBox Yes
+				{
+				Send REVISION SUMMARY{Enter}
+				Send Full/Partial:{Enter}- {Enter} {Enter}
+				Send Orig:{Enter}- {Enter} {Enter}
+				Send PO(s)/PO Types:{Enter}- <{Enter} {Enter}
+				Send Invoice(s)/OgInvAmt:{Enter}- {Enter} {Enter}
+				Send Gross:{Enter}- {Enter} {Enter}
+				Send Age:{Enter}- {Enter} {Enter}
+				Send 2381:{Enter}- {Enter} {Enter}
+				Send Note:{Enter}- {Enter}
+				Send --------------------{Enter}
+				}
+	{
+	Send Notes:{Enter}- {Enter} {Enter}
+	Send In Tool:{Enter}- {Enter} {Enter}
+	Send Outside Tool:{Enter}- {Enter} {Enter}
+	Send Titan:{Enter}- {Enter} {Enter}
+	Send SDF:{Enter}- {Enter} {Enter}
+	Send TOCRs:{Enter}- Legacy {Enter}- {Enter} {Enter}
+	Send Questions:{Enter}- {Enter} 
+	Send {Enter}==================================================================={Enter}
+	}
+	
+return
+;================================
+;QA Notes Format
+;================================
+SendMode Input
+SetKeyDelay, 30,500
+#+9::
+	Send {Enter}==================================================================={Enter}
+	Send CAS/Name:{Tab}{Tab}{Enter}
+	Send Processor:{Tab}{Tab}{Enter}
+	Send Loop Y/N:{Tab}{Tab}{Enter}
+	Send --------------------{Enter}
+	Send Request/Emails:{Enter}{Enter}
+	Send --------------------{Enter}
+	Send NOTE:{Enter}- {Enter} {Enter}
+	Send CPS:{Enter}- {Enter} {Enter}
+	Send MSQ/VLC:{Enter}- {Enter} {Enter}
+	Send SUPPORTING DOCS:{Enter}- {Enter} {Enter}
+	Send MOPET:{Enter}- {Enter} {Enter}
+	Send COSMIC:{Enter}- {Enter} {Enter}
+	Send FLAGS:{Enter}- {Enter} {Enter}
+	Send TOCRs:{Enter}- {Enter} {Enter}
+	Send SDF:{Enter}- {Enter} {Enter}
+	Send Kick Questions:{Enter}- {Enter}
+	Send {Enter}==================================================================={Enter}
+return
+
+
+;================================
+;Teams Format
+;================================
+
+#0::
+	SendInput Hi, I'm with DCoE, do you have a minute to IM about
+return
+
+;================================
+;Opp Id Blurb
+;================================
+
+#o::
+	SendInput DCoE CPS - No OPID Provided
+return
+
+
+;================================
+;Ramped discounts note
+;================================
+
+#+r::
+	SendInput The uneven payments are due to varying discounts per year on certain products.
+return
+
+#+f::
+	SendInput Future Pricing Table includes varying discounts across different years.
+return
+
+;================================
+;Memes
+;================================
+
+#+m::
+	Send ¯\_(ツ)_/¯
+return
+
+#+n::
+	Send (ノಠ益ಠ)ノ︵ ┻━┻
+return
+
+#+b::
+	Send ( ͡° ͜ʖ ͡°)
+return
+
+#+d::
+	Send Do unless you don't unless it isn't, except for this certain time, then maybe always assume everything but nothing.
+return
+
+#+q::
+	Send %A_Hour%:%A_Min%:%A_Sec%
+return
+
+#+p::
+	Send (¯`·._.·(¯`·._.· Peace ·._.·´¯)·._.·´¯)
+return
+
+#q::
+	Send 👍G2G
+return
+;================================
+;Show Clipboard
+;================================
+#c::
+Gui New, +AlwaysOnTop +Owner -MinimizeBox, Clipboard
+Gui Add, Edit, w300 R10 ReadOnly +HWNDhEdit
+Gui Show, AutoSize
+OnClipboardChange("Update")
+Return
+
+Update(type) {
+	global hEdit
+
+	if (type != 2)
+		GuiControl Text, % hEdit, % Clipboard
+}
+
+;================================
+;END OF SCRIPT						
+;================================
